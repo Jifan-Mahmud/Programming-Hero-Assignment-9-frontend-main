@@ -19,7 +19,7 @@ import {
 } from "lucide-react";
 
 export default function MyBookingsPage() {
-  const { API_BASE_URL } = useAuth();
+  const { API_BASE_URL, getAuthHeaders } = useAuth();
   const [bookings, setBookings] = useState([]);
   const [loading, setLoading] = useState(true);
 
@@ -35,6 +35,7 @@ export default function MyBookingsPage() {
     try {
       setLoading(true);
       const res = await fetch(`${API_BASE_URL}/api/bookings/my`, {
+        headers: { ...getAuthHeaders() },
         credentials: "include",
       });
       if (res.ok) {
@@ -61,6 +62,7 @@ export default function MyBookingsPage() {
         `${API_BASE_URL}/api/bookings/${cancelTarget._id}/cancel`,
         {
           method: "PATCH",
+          headers: { ...getAuthHeaders() },
           credentials: "include",
         }
       );

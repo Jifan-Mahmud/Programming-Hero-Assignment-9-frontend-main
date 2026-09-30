@@ -17,7 +17,7 @@ const AMENITY_OPTIONS = [
 ];
 
 export default function AddRoomPage() {
-  const { API_BASE_URL } = useAuth();
+  const { API_BASE_URL, getAuthHeaders } = useAuth();
   const router = useRouter();
 
   const [name, setName] = useState("");
@@ -53,7 +53,7 @@ export default function AddRoomPage() {
       setSubmitting(true);
       const res = await fetch(`${API_BASE_URL}/api/rooms`, {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: { "Content-Type": "application/json", ...getAuthHeaders() },
         body: JSON.stringify({
           name,
           description,

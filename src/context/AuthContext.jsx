@@ -32,8 +32,31 @@ export function AuthProvider({ children }) {
   });
 
   const [loading, setLoading] = useState(true);
+  const [token, setToken] = useState(() => {
+    if (typeof window !== "undefined") {
+      try {
+        return localStorage.getItem("studynook_jwt_token") || null;
+      } catch (e) {}
+    }
+    return null;
+  });
 
-  // Request JWT token from backend and sync into browser cookies
+  // Helper to get Authorization headers for fetch requests
+  const getAuthHeaders = () => {
+    let t = token;
+    if (!t && typeof window !== "undefined") {
+      try {
+        t = localStorage.getItem("studynook_jwt_token");
+        if (!t && typeof document !== "undefined") {
+          const match = document.cookie.match(/(?:^|;\s*)token=([^;]*)/);
+          if (match) t = match[1];
+        }
+      } catch (e) {}
+    }
+    return t ? { Authorization: `Bearer ${t}` } : {};
+  };
+
+  // Request JWT token from backend and sync into browser cookies and localStorage
   const syncJwtWithBackend = async (userData) => {
     if (!userData || !userData.email) return;
     try {
@@ -49,9 +72,17 @@ export function AuthProvider({ children }) {
         }),
       });
       const data = await res.json();
-      if (data?.token && typeof document !== "undefined") {
-        // Explicitly set cookie so it appears under http://localhost:3000 in DevTools -> Application -> Cookies
-        document.cookie = `token=${data.token}; path=/; max-age=604800; SameSite=Lax`;
+      if (data?.token) {
+        setToken(data.token);
+        if (typeof window !== "undefined") {
+          try {
+            localStorage.setItem("studynook_jwt_token", data.token);
+            // In production HTTPS, use SameSite=None; Secure for cross-origin cookies
+            const isHttps = window.location.protocol === "https:";
+            const cookieSec = isHttps ? "; SameSite=None; Secure" : "; SameSite=Lax";
+            document.cookie = `token=${data.token}; path=/; max-age=604800${cookieSec}`;
+          } catch (e) {}
+        }
       }
     } catch (e) {
       console.warn("JWT sync error:", e);
@@ -59,12 +90,14 @@ export function AuthProvider({ children }) {
   };
 
   // Helper to persist user to state and localStorage
-  const saveUserState = (u) => {
+  const saveUserState = async (u) => {
     if (!u) {
       setUser(null);
+      setToken(null);
       if (typeof window !== "undefined") {
         try {
           localStorage.removeItem(CACHE_KEY);
+          localStorage.removeItem("studynook_jwt_token");
           document.cookie = "token=; path=/; max-age=0; expires=Thu, 01 Jan 1970 00:00:00 GMT";
         } catch (e) {}
       }
@@ -87,8 +120,8 @@ export function AuthProvider({ children }) {
       } catch (e) {}
     }
 
-    // Automatically issue JWT token and store in Cookies
-    syncJwtWithBackend(normalizedUser);
+    // Automatically issue JWT token and store in Cookies and localStorage
+    await syncJwtWithBackend(normalizedUser);
 
     return normalizedUser;
   };
@@ -99,15 +132,22 @@ export function AuthProvider({ children }) {
       setLoading(true);
       const sessionResult = await authClient.getSession();
       if (sessionResult?.data?.user) {
-        const normalized = saveUserState(sessionResult.data.user);
+        await saveUserState(sessionResult.data.user);
       } else {
         // Fallback: check Express backend /api/auth/me
         try {
           const res = await fetch(`${API_BASE_URL}/api/auth/me`, {
+            headers: { ...getAuthHeaders() },
             credentials: "include",
           });
           if (res.ok) {
             const data = await res.json();
+            if (data?.token) {
+              setToken(data.token);
+              try {
+                localStorage.setItem("studynook_jwt_token", data.token);
+              } catch (e) {}
+            }
             if (data?.user) {
               saveUserState(data.user);
             } else {
@@ -145,7 +185,7 @@ export function AuthProvider({ children }) {
         throw new Error(error.message || "Invalid email or password");
       }
 
-      const normalized = saveUserState(data.user);
+      const normalized = await saveUserState(data.user);
       toast.success("Welcome back! Login successful.");
       return { success: true, user: normalized };
     } catch (error) {
@@ -195,7 +235,7 @@ export function AuthProvider({ children }) {
       }
 
       if (data?.user) {
-        const normalized = saveUserState({
+        const normalized = await saveUserState({
           ...data.user,
           image: data.user.image || avatar,
           photoURL: data.user.image || avatar,
@@ -246,6 +286,7 @@ export function AuthProvider({ children }) {
         logout,
         checkAuthStatus: syncSession,
         API_BASE_URL,
+        getAuthHeaders,
       }}
     >
       {children}

@@ -19,7 +19,7 @@ import {
 } from "lucide-react";
 
 export default function MyListingsPage() {
-  const { API_BASE_URL } = useAuth();
+  const { API_BASE_URL, getAuthHeaders } = useAuth();
   const [rooms, setRooms] = useState([]);
   const [loading, setLoading] = useState(true);
 
@@ -35,6 +35,7 @@ export default function MyListingsPage() {
     try {
       setLoading(true);
       const res = await fetch(`${API_BASE_URL}/api/rooms/user/me`, {
+        headers: { ...getAuthHeaders() },
         credentials: "include",
       });
       if (res.ok) {
@@ -59,6 +60,7 @@ export default function MyListingsPage() {
       setDeleteSubmitting(true);
       const res = await fetch(`${API_BASE_URL}/api/rooms/${deleteTarget._id}`, {
         method: "DELETE",
+        headers: { ...getAuthHeaders() },
         credentials: "include",
       });
 

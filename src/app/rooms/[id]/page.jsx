@@ -52,7 +52,7 @@ export default function RoomDetailsPage({ params }) {
   const resolvedParams = use(params);
   const roomId = resolvedParams.id;
 
-  const { user, API_BASE_URL } = useAuth();
+  const { user, API_BASE_URL, getAuthHeaders } = useAuth();
   const router = useRouter();
 
   const [room, setRoom] = useState(null);
@@ -165,7 +165,7 @@ export default function RoomDetailsPage({ params }) {
       setBookingSubmitting(true);
       const res = await fetch(`${API_BASE_URL}/api/bookings`, {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: { "Content-Type": "application/json", ...getAuthHeaders() },
         body: JSON.stringify({
           roomId: room._id,
           date: bookingDate,
@@ -203,7 +203,7 @@ export default function RoomDetailsPage({ params }) {
       setEditSubmitting(true);
       const res = await fetch(`${API_BASE_URL}/api/rooms/${room._id}`, {
         method: "PUT",
-        headers: { "Content-Type": "application/json" },
+        headers: { "Content-Type": "application/json", ...getAuthHeaders() },
         body: JSON.stringify(editForm),
         credentials: "include",
       });
@@ -230,6 +230,7 @@ export default function RoomDetailsPage({ params }) {
       setDeleteSubmitting(true);
       const res = await fetch(`${API_BASE_URL}/api/rooms/${room._id}`, {
         method: "DELETE",
+        headers: { ...getAuthHeaders() },
         credentials: "include",
       });
 
