@@ -120,8 +120,8 @@ export default function MyBookingsPage() {
         {loading ? (
           <LoadingSpinner text="Fetching your study room reservations..." />
         ) : bookings.length === 0 ? (
-          <div className="text-center py-20 bg-white dark:bg-zinc-900 rounded-3xl border border-zinc-200 dark:border-zinc-800 shadow-sm p-8">
-            <div className="w-16 h-16 rounded-full bg-teal-50 dark:bg-teal-950/60 flex items-center justify-center text-teal-600 dark:text-teal-400 mx-auto mb-4">
+          <div className="text-center py-20 bg-white dark:bg-zinc-900 rounded-3xl border border-zinc-200 dark:border-zinc-800 shadow-sm p-8 flex flex-col items-center justify-center">
+            <div className="w-16 h-16 rounded-2xl bg-teal-500/10 dark:bg-teal-500/15 border border-teal-500/30 flex items-center justify-center text-teal-600 dark:text-teal-400 mb-4 shadow-sm">
               <BookmarkCheck className="w-8 h-8" />
             </div>
             <h3 className="text-xl font-bold text-zinc-900 dark:text-white">

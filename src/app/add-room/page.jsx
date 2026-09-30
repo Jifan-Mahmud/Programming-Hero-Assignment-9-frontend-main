@@ -223,13 +223,13 @@ export default function AddRoomPage() {
                       onClick={() => toggleAmenity(amenity)}
                       className={`p-3 rounded-xl border cursor-pointer select-none flex items-center gap-2.5 transition-all ${
                         isChecked
-                          ? "border-teal-500 bg-teal-50 dark:bg-teal-950/60 text-teal-800 dark:text-teal-200 font-semibold"
-                          : "border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-950 text-zinc-600 dark:text-zinc-400"
+                          ? "border-teal-500 bg-teal-500/15 dark:bg-teal-500/20 text-teal-800 dark:text-teal-200 font-semibold shadow-sm"
+                          : "border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-900/60 text-zinc-600 dark:text-zinc-400 hover:border-zinc-300 dark:hover:border-zinc-700"
                       }`}
                     >
                       <CheckCircle2
-                        className={`w-4 h-4 ${
-                          isChecked ? "text-teal-600 dark:text-teal-400" : "text-zinc-300 dark:text-zinc-700"
+                        className={`w-4 h-4 shrink-0 ${
+                          isChecked ? "text-teal-600 dark:text-teal-400" : "text-zinc-400 dark:text-zinc-600"
                         }`}
                       />
                       <span className="text-xs">{amenity}</span>

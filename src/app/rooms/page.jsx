@@ -4,7 +4,7 @@ import { useEffect, useState, useCallback } from "react";
 import { useAuth } from "../../context/AuthContext";
 import RoomCard from "../../components/RoomCard";
 import { RoomCardSkeleton } from "../../components/LoadingSpinner";
-import { Search, Filter, RotateCcw, SlidersHorizontal, BookOpen } from "lucide-react";
+import { Search, Filter, RotateCcw, SlidersHorizontal, BookOpen, Check } from "lucide-react";
 
 const AMENITY_OPTIONS = [
   "Whiteboard",
@@ -128,7 +128,7 @@ export default function RoomsPage() {
                 placeholder="e.g. Quiet Pod 304..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-950 text-sm text-zinc-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-teal-500"
+                className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-950 text-sm text-zinc-900 dark:text-white placeholder:text-zinc-400 dark:placeholder:text-zinc-600 focus:outline-none focus:ring-2 focus:ring-teal-500"
               />
             </div>
           </div>
@@ -141,7 +141,7 @@ export default function RoomsPage() {
             <select
               value={selectedFloor}
               onChange={(e) => setSelectedFloor(e.target.value)}
-              className="w-full px-3.5 py-2.5 rounded-xl border border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-950 text-sm text-zinc-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-teal-500"
+              className="w-full px-3.5 py-2.5 rounded-xl border border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-950 text-sm text-zinc-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-teal-500 cursor-pointer"
             >
               {FLOOR_OPTIONS.map((floor) => (
                 <option key={floor} value={floor}>
@@ -151,27 +151,36 @@ export default function RoomsPage() {
             </select>
           </div>
 
-          {/* Amenities Checkboxes */}
+          {/* Amenities Grid */}
           <div>
             <label className="block text-xs font-bold uppercase tracking-wider text-zinc-500 dark:text-zinc-400 mb-3">
               Amenities
             </label>
-            <div className="space-y-2.5">
+            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-1 gap-2">
               {AMENITY_OPTIONS.map((amenity) => {
                 const isChecked = selectedAmenities.includes(amenity);
                 return (
-                  <label
+                  <button
                     key={amenity}
-                    className="flex items-center gap-3 text-xs font-medium text-zinc-700 dark:text-zinc-300 cursor-pointer select-none hover:text-teal-600 transition-colors"
+                    type="button"
+                    onClick={() => toggleAmenity(amenity)}
+                    className={`flex items-center gap-2.5 px-3 py-2 rounded-xl border text-xs font-medium transition-all text-left select-none ${
+                      isChecked
+                        ? "bg-teal-500/15 border-teal-500 text-teal-700 dark:text-teal-300 font-semibold shadow-xs"
+                        : "bg-zinc-50 dark:bg-zinc-950 border-zinc-200 dark:border-zinc-800 text-zinc-600 dark:text-zinc-400 hover:border-zinc-300 dark:hover:border-zinc-700"
+                    }`}
                   >
-                    <input
-                      type="checkbox"
-                      checked={isChecked}
-                      onChange={() => toggleAmenity(amenity)}
-                      className="w-4 h-4 rounded border-zinc-300 text-teal-600 focus:ring-teal-500"
-                    />
-                    <span>{amenity}</span>
-                  </label>
+                    <span
+                      className={`w-4 h-4 rounded-md border flex items-center justify-center shrink-0 transition-colors ${
+                        isChecked
+                          ? "bg-teal-600 border-teal-600 text-white"
+                          : "border-zinc-300 dark:border-zinc-700 bg-transparent"
+                      }`}
+                    >
+                      {isChecked && <Check className="w-3 h-3 stroke-[3]" />}
+                    </span>
+                    <span className="truncate">{amenity}</span>
+                  </button>
                 );
               })}
             </div>
