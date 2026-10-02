@@ -3,8 +3,7 @@ import { MongoClient } from "mongodb";
 import { mongodbAdapter } from "better-auth/adapters/mongodb";
 
 const MONGODB_URL =
-  process.env.MONGODB_URL ||
-  "mongodb+srv://mongodb-query:SxH9y7JTh9vmJGmK@cluster0.kj6ydhe.mongodb.net/?appName=Cluster0";
+  process.env.MONGODB_URL;
 
 const client = new MongoClient(MONGODB_URL);
 const db = client.db("studynook_db");
